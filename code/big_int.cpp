@@ -17,6 +17,7 @@ struct big_int {
         for (int i = 0; i < st - s1.length() % st; ++i)
             s += '0';
         s += s1;
+		base.reserve(s.size() / st + 1);
         long long temp = 0;
         for (int i = int(s.length()) - st; i >= 0; i -= st) {
             temp = 0;
