@@ -19,9 +19,13 @@ template <typename T>
 struct Vector {
     T x, y;
     Vector(T x = 0, T y = 0) : x(x), y(y) {}
+
+    T len() {
+        return sqrt(x * x + y * y);
+    }
     
     Vector normalize() {
-        T d = sqrt(x * x + y * y);
+        T d = len();
         return Vector(x / d, y / d);
     }
     
@@ -68,7 +72,7 @@ bool operator < (Vector<T> a, Vector<T> b) {
 }
 
 template <typename T>
-bool operator >(Vector<T> a, Vector<T> b) {
+bool operator > (Vector<T> a, Vector<T> b) {
     return a.x != b.x ? a.x > b.x : a.y > b.y;
 }
 
@@ -180,4 +184,14 @@ int main() {
 }
 
 // Authors = JohnHook
-// TODO API
+// Vector - вектор, Line - прямая, Section - отрезок
+// Vector(две координаты)
+// Присутствуют все очевидные операторы, * - скалярное произведение, ^ - косое произведение
+// Методы: len - длина, normalize - вектор еденичной длины
+// Функции для Vector: getAngle - угол в радианах/градусах, len - расстояние между двумя векторами
+// Line(две точки)
+// Присутствуют все очевидные операторы
+// Методы: normalize - нормализовка коэфицентов, так что для двух одинаковых прямых коэфиценты будут одинаковыми
+// Функции для Line: intersection - точка пересечения
+// Section(две точки)
+// Функции для Section: intersect - пересечение двух отрезков

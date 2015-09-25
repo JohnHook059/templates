@@ -25,3 +25,5 @@ void build_hash_arr(string s) { // s - не пустая
 long long hash_sub_str(int l, int r) { // нумерация символов с нуля; полуинтервал; 0 <= l,r <= s.length() 
 	return ((h[r] - h[l] * p[r - l]) % MOD + MOD) % MOD;
 }
+
+// Authors = Vito

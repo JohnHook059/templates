@@ -33,3 +33,5 @@ std::vector<int> pref(std::string s) {
 }
 
 // Authors = JohnHook
+// z и префикс функции
+// На входе строка, на выходе вектор интов

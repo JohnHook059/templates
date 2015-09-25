@@ -29,3 +29,5 @@ int main() {
 		cin >> arr[i];
 	}
 }
+
+// Authors = Vito
