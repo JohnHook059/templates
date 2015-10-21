@@ -24,7 +24,7 @@ struct el {
 
 struct tree {
     el *top;
-    
+
     tree(tree *left = nullptr, tree *right = nullptr, char value = '\0', double weight = 0.0) {
         el *p = new el;
         p->ok = true;
@@ -38,7 +38,7 @@ struct tree {
         }
         top = p;
     }
-    
+
     bool operator < (const tree& other) const {
         return top->weight > other.top->weight;
     }
@@ -68,7 +68,7 @@ void rec(el e, string s) {
         dict[e.value] = s;
         return;
     }
-    
+
     if (e.left != nullptr && e.left->ok) {
         dict_str += '0';
         rec(*e.left, s + '0');
@@ -108,6 +108,7 @@ string chtos(unsigned char n) { // lol
 
 string bstochs(string s) {
     string ans = "", temp = "";
+    ans.push_back(((unsigned char)s.length()));
     for (int i = 0; i < s.size(); i += 8) {
         for (int j = i; j < min(i + 8, int(s.size())); j++)
             temp += s[j];
@@ -116,8 +117,23 @@ string bstochs(string s) {
             temp = "";
         }
     }
-    ans += "##" + temp + "##";
-    return ans;
+    //ans += "##" + temp + "##";
+    return ans + temp;
+}
+
+string bstochs2(string s) {
+    string ans = "", temp = "", f_ans = "";
+    for (int i = 0; i < s.size(); i += 8) {
+        for (int j = i; j < min(i + 8, int(s.size())); j++)
+            temp += s[j];
+        if (temp.size() == 8) {
+            ans += stoch(temp);
+            temp = "";
+        }
+    }
+    //ans += "##" + temp + "##";
+    f_ans.push_back(((unsigned char)temp.length()));
+    return f_ans + ans + temp;
 }
 
 //~PARSER
@@ -126,53 +142,45 @@ string hafman(string s) {
     dict = map<char, string>();
     dict_str = "";
     dict_str_2 = "";
+    string ch = "";
     rec(*_hafman(s).top, "");
     string ans = "";
     for (char ch: s)
         ans += dict[ch];
-    return dict_str_2 + "##" + bstochs(dict_str + '1') + bstochs(ans);
+    ch.push_back(((unsigned char)dict_str_2.length()));
+    string rv = ch + dict_str_2 + bstochs(dict_str + '1') + bstochs2(ans);
+    return rv;
 }
 
 string unhafman(string h) {
     map<char, string> dict;
-    string s = "";
+    string str = "";
     string dict_str = "", dict_str_2 = "";
-    
+
     //PARSER
-    
-    int it = 0;
-    while (h[it] != '#' || h[it + 1] != '#') {
-        dict_str_2 += h[it];
-        it++;
-    }
-    it += 2;
-    
-    while (h[it] != '#' || h[it + 1] != '#') {
-        dict_str += chtos(h[it]);
-        it++;
-    }
-    it += 2;
-    for (; it < h.size() && (h[it] != '#' || h[it + 1] != '#'); it++)
-        dict_str += h[it];
-    it += 2;
-    
-    while (h[it] != '#' || h[it + 1] != '#') {
-        s += chtos(h[it]);
-        it++;
-    }
-    it += 2;
-    for (; it < h.size() && (h[it] != '#' || h[it + 1] == '#'); it++)
-        s += h[it];
-    
+    int f = h[0], s = h[f + 1], ppp = h[f + s / 8 + s % 8 + 2];
+    int third = (h.length() - f - s / 8 - s % 8 - 3 - ppp) * 8 + ppp;
+    for (int i = 1; i < f + 1; i++)
+        dict_str_2 += h[i];
+
+    for (int i = f + 2; i < f + s / 8 + 2; i++)
+        dict_str += chtos(h[i]);
+    for (int i = 0; i < s % 8; i++)
+        dict_str += h[f + s / 8 + 2 + i];
+
+    for (int i = f + s / 8 + s % 8 + 3; i < f + s / 8 + s % 8 + 3 + third / 8; i++)
+        str += chtos(h[i]);
+    for (int i = 0; i < third % 8; i++)
+        str += h[f + s / 8 + s % 8 + 3 + third / 8 + i];
     //~UNPARSER
-    
+
     el *t = new el();
     string key = "";
     int uk = 0;
     for (char ch: dict_str)
         if (ch == '0') {
             key += '0';
-            
+
             el *p = new el();
             p->father = t;
             t->left = p;
@@ -183,7 +191,7 @@ string unhafman(string h) {
             dict[dict_str_2[uk++]] = key;
             while (key.back() == '1') {
                 key.pop_back();
-                
+
                 t = t->father;
             }
             if (!key.empty()) {
@@ -197,7 +205,7 @@ string unhafman(string h) {
         }
     string ans = "";
     el *et = t;
-    for (char ch: s) {
+    for (char ch: str) {
         if (ch == '0')
             t = t->left;
         if (ch == '1')
@@ -207,7 +215,7 @@ string unhafman(string h) {
             t = et;
         }
     }
-    
+
     return ans;
 }
 // одна буква - проблема?
@@ -224,7 +232,6 @@ int main(int argc, const char * argv[]) {
 //    fclose(inp);
 //    fprintf(otp, "%s", hafman(file).c_str());
 //    fclose(otp);
-    
     string s ="\
     Time to live\n\
     Time to lie\n\
@@ -260,10 +267,11 @@ int main(int argc, const char * argv[]) {
     Oh, you've been movin' much too fast\n\
     Movin' much too fast\n\
     Movin' much too fast\n";
-    //string s = "missisipi";
+    //third < 256 - fixed!
+    //string s = "missisipi!";
     cout << s << endl << hafman(s) << endl << unhafman(hafman(s)) << endl;
     cout << (double) hafman(s).length() / s.length() << endl;;
     //cout << stoch("10001111") << endl << chtos('\217') << endl;
-    
+
     return 0;
 }
