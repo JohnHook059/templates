@@ -139,6 +139,7 @@ string bstochs2(string s) {
 //~PARSER
 
 string hafman(string s) {
+    s += '\n';
     dict = map<char, string>();
     dict_str = "";
     dict_str_2 = "";
@@ -216,22 +217,11 @@ string unhafman(string h) {
         }
     }
 
+    ans.erase(ans.size() - 1);
     return ans;
 }
-// одна буква - проблема?
 
 int main(int argc, const char * argv[]) {
-//    char* inp_name;
-//    scanf("%ch", inp_name);
-//    char *otp_name = inp_name + *".jh";
-//    FILE *inp = fopen(inp_name, "r");
-//    FILE *otp = fopen(otp_name, "w");
-//    char* file, temp;
-//    while (fscanf(inp, "%ch", temp) != NULL)
-//        file += temp;
-//    fclose(inp);
-//    fprintf(otp, "%s", hafman(file).c_str());
-//    fclose(otp);
     string s ="\
     Time to live\n\
     Time to lie\n\
@@ -267,11 +257,10 @@ int main(int argc, const char * argv[]) {
     Oh, you've been movin' much too fast\n\
     Movin' much too fast\n\
     Movin' much too fast\n";
-    //third < 256 - fixed!
-    //string s = "missisipi!";
-    cout << s << endl << hafman(s) << endl << unhafman(hafman(s)) << endl;
-    cout << (double) hafman(s).length() / s.length() << endl;;
-    //cout << stoch("10001111") << endl << chtos('\217') << endl;
+    //string s = "missisipi";
+    cout << hafman(s) << endl << unhafman(hafman(s)) << endl;
+    cout << (s == unhafman(hafman(s)) ? "OK" : "WA") << endl;
+    cout << (double) hafman(s).length() / s.length() << endl;
 
     return 0;
 }
