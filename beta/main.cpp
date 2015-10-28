@@ -8,6 +8,7 @@
 #include <string>
 #include <map>
 #include <queue>
+#include <algorithm>
 using namespace std;
 
 struct el {
@@ -20,7 +21,7 @@ struct el {
 
 struct tree {
     el *top;
-    
+
     tree(tree *left = nullptr, tree *right = nullptr, char value = '\0', double weight = 0.0) {
         el *p = new el;
         p->ok = true;
@@ -34,7 +35,7 @@ struct tree {
         }
         top = p;
     }
-    
+
     bool operator < (const tree& other) const {
         return top->weight > other.top->weight;
     }
@@ -64,7 +65,7 @@ void rec(el e, string s) {
         dict[e.value] = s;
         return;
     }
-    
+
     if (e.left != nullptr && e.left->ok) {
         dict_str += '0';
         rec(*e.left, s + '0');
@@ -135,6 +136,7 @@ string bstochs2(string s) {
 //~PARSER
 
 string hafman(string s) {
+    if (s == "") return "";
     s += '\n';
     dict = map<char, string>();
     dict_str = "";
@@ -150,34 +152,35 @@ string hafman(string s) {
 }
 
 string unhafman(string h) {
+    if (h == "") return "";
     map<char, string> dict;
     string str = "";
     string dict_str = "", dict_str_2 = "";
-    
+
     //PARSER
     int f = h[0], s = h[f + 1], ppp = h[f + s / 8 + s % 8 + 2];
     int third = (int(h.length()) - f - s / 8 - s % 8 - 3 - ppp) * 8 + ppp;
     for (int i = 1; i < f + 1; i++)
         dict_str_2 += h[i];
-    
+
     for (int i = f + 2; i < f + s / 8 + 2; i++)
         dict_str += chtos(h[i]);
     for (int i = 0; i < s % 8; i++)
         dict_str += h[f + s / 8 + 2 + i];
-    
+
     for (int i = f + s / 8 + s % 8 + 3; i < f + s / 8 + s % 8 + 3 + third / 8; i++)
         str += chtos(h[i]);
     for (int i = 0; i < third % 8; i++)
         str += h[f + s / 8 + s % 8 + 3 + third / 8 + i];
     //~UNPARSER
-    
+
     el *t = new el();
     string key = "";
     int uk = 0;
     for (char ch: dict_str)
         if (ch == '0') {
             key += '0';
-            
+
             el *p = new el();
             p->father = t;
             t->left = p;
@@ -188,7 +191,7 @@ string unhafman(string h) {
             dict[dict_str_2[uk++]] = key;
             while (key.back() == '1') {
                 key.pop_back();
-                
+
                 t = t->father;
             }
             if (!key.empty()) {
@@ -212,13 +215,14 @@ string unhafman(string h) {
             t = et;
         }
     }
-    
+
     ans.erase(ans.size() - 1);
     return ans;
 }
 
 #include <fstream>
 #include <iostream>
+#include <cstring>
 int main(int argc, const char* argv[]) {
 //    string s ="\
 //    Time to live\n\
@@ -260,36 +264,39 @@ int main(int argc, const char* argv[]) {
 //    cout << (s == unhafman(hafman(s)) ? "OK" : "WA") << endl;
 //    cout << (double) hafman(s).length() / s.length() << endl;
 
-    
-    
-    if (strncmp(argv[1], "-h", 2)) {
-        cout << "use -s %file_name to squeeze\n\
-        use -u %file_name to unsqueeze\n";
+
+
+    if (strncmp(argv[1], "-h", 2) == 0) {
+        cout << "use -s %file_name to squeeze\nuse -u %file_name to unsqueeze\n";
         exit(0);
     }
-    
+
     ifstream fin;
     ofstream fout;
-    fin.open(argv[1]);
-    
-    string file_name = argv[1];
-    if (strncmp(argv[1], "-s", 2)) {
+    fin.open(argv[2]);
+
+    string file_name = argv[2];
+    if (strncmp(argv[1], "-s", 2) == 0) {
         file_name.append(".jh");
         fout.open(file_name.c_str());
-        
+
         string s = "", temp;
-        while (fin >> temp) s += temp;
+        while (getline(fin, temp)) s += temp + '\n';
         fout << hafman(s);
     }
-    
-    if (strncmp(argv[1], "-u", 2)) {
+
+    if (strncmp(argv[1], "-u", 2) == 0) {
         for (int i = 0; i < 3; i++) file_name.erase(file_name.size() - 1); //TODO
         fout.open(file_name.c_str());
-        
+
         string s = "", temp;
-        while (fin >> temp) s += temp;
+        while (getline(fin, temp)) s += temp + '\n';
         fout << unhafman(s);
     }
-    
+
     return 0;
 }
+
+// g++ -o main main.cpp -std=c++11
+// ./main -h
+
