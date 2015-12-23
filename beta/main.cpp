@@ -222,7 +222,7 @@ string unhafman(string h) {
 //
 string read(string s) {
     FILE *f;
-    f = fopen(s.c_str(), "rb");
+    f = fopen(s.c_str(), "r");
     string ans = "";
     char text;
     while (fscanf(f, "%c", &text) != EOF)
@@ -233,7 +233,7 @@ string read(string s) {
 
 void write(string s, string p) {
     FILE *f;
-    f = fopen(s.c_str(), "wb");
+    f = fopen(s.c_str(), "w");
     for (char ch: p)
         fprintf(f, "%c", ch);
     fclose(f);
@@ -283,6 +283,7 @@ int main(int argc, const char* argv[]) {
 //    cout << (double) hafman(s).length() / s.length() << endl;
     
     
+    setlocale(LC_ALL, "");
     
     if (strncmp(argv[1], "-h", 2) == 0) {
         cout << "use -s %file_name to squeeze\nuse -u %file_name to unsqueeze\n";
@@ -291,13 +292,13 @@ int main(int argc, const char* argv[]) {
     string file_name = argv[2];
     
     if (strncmp(argv[1], "-s", 2) == 0) {
-        cerr << read(file_name);
+        //cerr << read(file_name);
         write(file_name + ".jh", hafman(read(file_name)));
     }
     
     if (strncmp(argv[1], "-u", 2) == 0) {
         for (int i = 0; i < 3; i++) file_name.erase(file_name.size() - 1); //TODO
-        cerr << read(file_name + ".jh");
+        //cerr << read(file_name + ".jh");
         write(file_name, unhafman(read(file_name + ".jh")));
     }
     
