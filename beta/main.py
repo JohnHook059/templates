@@ -1,19 +1,18 @@
-__author__ = 'JohnHook'
-
 class Tree:
-    def __init__(self, leaf=False, value='', weight=0, left=0, right=0):
-        self.left, self.right = left, right
-        self.leaf, self.value, self.weight = leaf, value, weight
+    def __init__(self, leaf=False, value=0, weight=0, left=0, right=0):
+        self.leaf, self.value, self.weight, self.left, self.right = leaf, value, weight, left, right
 
     def __lt__(self, other):
         return self.weight < other.weight
 
+
 class Archive:
     def __init__(self, file_name):
         stat = {}
-        file = open(file_name, mode='rb')
+        file = open(file_name, mode='r')
         for _ch in file.read():
-            ch = chr(_ch)
+            # print(_ch)
+            ch = _ch
             if ch in stat.keys():
                 stat[ch] += 1
             else:
@@ -37,15 +36,15 @@ class Archive:
             if t.leaf == True:
                 base[t.value] = tmp
             else:
-                rec(t.left, tmp + '0')
-                rec(t.right, tmp + '1')
-        rec(self.t, '')
+                rec(t.left, tmp + ['0'])
+                rec(t.right, tmp + ['1'])
+        rec(self.t, [])
 
-        self.a = ''
-        buffer = ''
-        file = open(file_name, mode='rb')
+        self.a = []
+        buffer = []
+        file = open(file_name, mode='r')
         for _ch in file.read():
-            ch = chr(_ch)
+            ch = _ch
             for b in base[ch]:
                 if len(buffer) == 8:
                     tmp = 0
@@ -53,9 +52,9 @@ class Archive:
                         tmp *= 2
                         if buffer[i] == '1':
                             tmp += 1
-                    self.a += chr(tmp)
-                    buffer = ''
-                buffer += b
+                    self.a += [tmp]
+                    buffer = []
+                buffer += [b]
         self.tail = buffer
         file.close()
 
@@ -63,10 +62,10 @@ class Archive:
     def un(self, file_name):
         def get():
             for ch in self.a:
-                tmp = ord(ch)
-                buffer = ''
+                tmp = ch
+                buffer = []
                 for i in range(8):
-                    buffer += '1' if tmp % 2 == 1 else '0'
+                    buffer += ['1'] if tmp % 2 == 1 else ['0']
                     tmp //= 2
                 for i in reversed(buffer):
                     yield int(i == '1')
@@ -76,9 +75,11 @@ class Archive:
         act = self.t
         file = open(file_name, mode='w')
         for tmp in get():
+            # print(tmp)
             act = act.left if tmp == 0 else act.right
 
             if act.leaf == True:
+                # print(act.value)
                 file.write(act.value)
                 act = self.t
 
@@ -114,3 +115,7 @@ def get_arguments():
 if __name__ == "__main__":
     get_arguments()
 
+
+# a = Archive('r.txt')
+# print('---------------')
+# a.un('r.txt')
