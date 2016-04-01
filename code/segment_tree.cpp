@@ -80,7 +80,9 @@ public:
 //     1. Вектор элементов того же типа, что и дерево.
 //     2. Функция по которой строится дерево.
 //     3. Нейтральный элемент.
-// Например: tree<int> t(array, sum, 0);
+// Например:
+// unsigned int sum(const unsigned int &a, const unsigned int &b) { return a + b; }
+// tree<unsigned int> t(*new vector<unsigned int>(N, 0), sum, 0);
 // Изменение элемента: single_update(позиция изменяемого элемента, новое значение)
 // Массовая операция изменения элементов: public_update(left, right, value)
 // Запрос: get(левая граница, правая граница(не включительно))
