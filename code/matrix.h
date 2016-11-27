@@ -19,19 +19,31 @@ private:
     }
 
     void to_stage_type() {
-        for (size_t j = 0; j < std::min(base.size(), base.back().size()); ++j)
+        for (size_t j = 0; j < std::min(base.size(), base.back().size()); ++j) {
+            if (base[j][j] == 0)
+                for (size_t i = j + 1; i < base.size(); ++i)
+                    if (base[i][j] != 0) {
+                        elementary_operation1(j, i, 1);
+                        std::cout << "NUM " << 1 << '\n';
+                        std::cout << *this << '\n';
+                    }
             for (size_t i = 0; i < base.size(); ++i) {
                 if (base[j][j] == 0)
                     break;
-                if (i != j)
+                if (i != j) {
+                    std::cout << "NUM " << T(-base[i][j], base[j][j]) << '\n';
                     elementary_operation1(i, j, T(-base[i][j], base[j][j]));
+                    std::cout << *this << '\n';
+                }
             }
+        }
     }
     void normalize() {
         for (size_t i = 0; i < std::min(base.size(), base.back().size()); ++i) {
             if (base[i][i] == 0)
                 return;
             elementary_operation2(i, T(T(1, 1), base[i][i]));
+            std::cout << *this << '\n';
         }
     }
 public:
@@ -54,6 +66,20 @@ public:
         to_stage_type();
         normalize();
     }
+    
+    matrix<T> inverse() const {
+        vector<vector<T>> v(base.size(), vector<T>(base.back().size() * 2)), ans(base.size(), vector<T>(base.back().size()));
+        for (size_t i = 0; i < base.size(); ++i) {
+            copy(base[i].begin(), base[i].end(), v[i].begin());
+            v[i][i + base.back().size()] = 1;
+        }
+        matrix<T> mtrx(v);
+        mtrx.solve();
+        for (size_t i = 0; i < base.size(); ++i)
+            for (size_t j = base.back().size(); j < base.back().size() * 2; ++j)
+                ans[i][j - base.back().size()] = mtrx.base[i][j];
+        return matrix<T>(ans);
+    }
 };
 
 template <typename T>
@@ -69,7 +95,7 @@ std::ostream& operator << (std::ostream& out, const matrix<T>& other) {
 template <typename T>
 matrix<T> operator *(const matrix<T>& a, const matrix<T>& b) {
     if (a.get_M() != b.get_N())
-        return matrix<T>(vector<vector<T>>());
+        throw std::out_of_range("");
     vector<vector<T>> v(a.get_N(), vector<T>(b.get_M()));
     for (size_t i = 0; i < a.get_N(); ++i)
         for (size_t j = 0; j < b.get_M(); ++j)
@@ -80,12 +106,10 @@ matrix<T> operator *(const matrix<T>& a, const matrix<T>& b) {
 
 template <typename T>
 matrix<T> Transpose(const matrix<T>& m) {
-    vector<vector<T>> ans(m.get_N(), vector<T>(m.get_M()));
+    vector<vector<T>> ans(m.get_M(), vector<T>(m.get_N()));
     for (size_t i = 0; i < m.get_N(); ++i)
-        for (size_t j = i; j < m.get_M(); ++j) {
-            ans[i][j] = m(j, i);
+        for (size_t j = 0; j < m.get_M(); ++j)
             ans[j][i] = m(i, j);
-        }
     return matrix<T>(ans);
 }
 
@@ -107,4 +131,26 @@ matrix<T> operator -(const matrix<T>& a, const matrix<T>& b) {
             ans[i][j] = a(i, j) - b(i, j);
     
     return matrix<T>(ans);
+}
+
+template <typename T>
+matrix<T> delij(const matrix<T>& m, size_t ii, size_t jj) {
+    vector<vector<T>> v(m.get_N() - 1, vector<T>(m.get_M() - 1));
+    for (size_t i = 0; i < m.get_N() - 1; ++i)
+        for (size_t j = 0; j < m.get_M() - 1; ++j)
+            v[i][j] = m(i + (i >= ii), j + (j >= jj));
+    return matrix<T>(v);
+}
+
+template <typename T>
+T determinant(const matrix<T>& m) {
+    if (m.get_N() != m.get_M())
+        throw std::out_of_range("");
+    
+    if (m.get_N() == 1)
+        return m(0, 0);
+    T ans;
+    for (size_t i = 0; i < m.get_N(); ++i)
+        ans += T(i % 2 ? -1 : 1) * m(i, 0) * determinant(delij(m, i, 0));
+    return ans;
 }
